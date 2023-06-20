@@ -1,0 +1,123 @@
+{% extends "registration/base.html" %}
+
+{% block title %}Project Reports{% endblock %}
+
+{% block content %}
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+        font-family: "SF Pro Text", "Myriad Set Pro", Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f5f5f7;
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+<body>
+  <h1>Progress Reports</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Title</th>
+        <th>Completed Work</th>
+        <th>Project Timeline</th>
+        <th>Planned Work</th>
+        <th>Project Issues</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for progress_report in progress_reports %}
+        <tr>
+          <td>{{ progress_report.report_date }}</td>
+          <td>{{ progress_report }}</td>
+          <td>
+            {% for completed_work in progress_report.completedwork_set.all %}
+              {% if completed_work.input1 or completed_work.input2 or completed_work.input3 or completed_work.input4 %}
+                {{ completed_work.input1 }}<br>
+                {{ completed_work.input2 }}<br>
+                {{ completed_work.input3 }}<br>
+                {{ completed_work.input4 }}<br><br>
+              {% endif %}
+            {% empty %}
+              No completed work
+            {% endfor %}
+          </td>
+          <td>
+            {% for project_timeline in progress_report.projecttimeline_set.all %}
+              {% if project_timeline.get_phase1_status_display or project_timeline.get_phase2_status_display or project_timeline.get_phase3_status_display %}
+                Phase 1: {{ project_timeline.get_phase1_status_display }}<br>
+                Phase 2: {{ project_timeline.get_phase2_status_display }}<br>
+                Phase 3: {{ project_timeline.get_phase3_status_display }}<br><br>
+              {% endif %}
+            {% empty %}
+              No project timeline
+            {% endfor %}
+          </td>
+          <td>
+            {% for planned_work in progress_report.plannedwork_set.all %}
+              {% if planned_work.input1 or planned_work.action1_status or planned_work.due_date1 or planned_work.input2 or planned_work.action2_status or planned_work.due_date2 or planned_work.input3 or planned_work.action3_status or planned_work.due_date3 %}
+                {{ planned_work.input1 }} ({{ planned_work.action1_status }})<br>
+                Due Date: {{ planned_work.due_date1 }}<br><br>
+                {{ planned_work.input2 }} ({{ planned_work.action2_status }})<br>
+                Due Date: {{ planned_work.due_date2 }}<br><br>
+                {{ planned_work.input3 }} ({{ planned_work.action3_status }})<br>
+                Due Date: {{ planned_work.due_date3 }}<br><br>
+              {% endif %}
+            {% empty %}
+              No planned work
+            {% endfor %}
+          </td>
+          <td>
+            {% for project_issue in progress_report.projectissues_set.all %}
+              {% if project_issue.input1 or project_issue.issue1_status or project_issue.input2 or project_issue.issue2_status or project_issue.input3 or project_issue.issue3_status %}
+                {{ project_issue.input1 }} ({{ project_issue.issue1_status }})<br>
+                {{ project_issue.input2 }} ({{ project_issue.issue2_status }})<br>
+                {{ project_issue.input3 }} ({{ project_issue.issue3_status }})<br><br>
+              {% endif %}
+            {% empty %}
+              No project issues
+            {% endfor %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="6">No progress reports found</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+{% endblock %}

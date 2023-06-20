@@ -1,0 +1,268 @@
+{% extends "registration/base.html" %}
+
+{% block title %}Weekly Table{% endblock %}
+
+{% block content %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Table</title>
+    <style>
+    body {
+        font-family: "SF Pro Text", "Myriad Set Pro", Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+      }
+      header {
+        background-color: #ffffff;
+        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.14), 0px 1px 5px rgba(0, 0, 0, 0.14);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 auto;
+        max-width: 800px;
+        height: 88px;
+        padding: 0 24px;
+      }
+      header h1 {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0;
+        letter-spacing: -0.3px;
+      }
+      header a {
+        color: #007aff;
+        font-size: 17px;
+        font-weight: 500;
+        text-decoration: none;
+      }
+      main {
+        max-width: 800px;
+        margin: 24px auto;
+        background-color: #ffffff;
+        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.14), 0px 1px 5px rgba(0, 0, 0, 0.14);
+        border-radius: 8px;
+        text-align: center;
+        padding: 24px;
+      }
+      p {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0 0 24px;
+        letter-spacing: -0.24px;
+      }
+      ul {
+        list-style-type: none;
+        text-align: center;
+        margin: 0 auto;
+        padding: 0;
+        max-width: 500px;
+      }
+      li {
+        margin-bottom: 16px;
+        font-size: 17px;
+        font-weight: 500;
+        border-bottom: 1px solid #e5e5e5;
+        padding-bottom: 16px;
+      }
+      li:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      li a {
+        color: #007aff;
+        text-decoration: none;
+        transition: color 0.2s ease-in-out;
+      }
+      li a:hover {
+        color: #0062cc;
+      }
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 18px;
+            color: #333;
+        }
+        h1 {
+            font-size: 36px;
+            font-weight: bold;
+            margin-top: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+            font-size: 16px;
+        }
+        th {
+            background-color: #f7f7f7;
+            color: #333;
+        }
+        select {
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            background-color: #f7f7f7;
+            border: none;
+            border-radius: 8px;
+        }
+        option {
+            font-size: 16px;
+        }
+        #totalHoursContainer {
+            text-align: center;
+            margin-top: 20px;
+        }
+        #totalHoursContainer strong {
+            font-weight: bold;
+            font-size: 20px;
+        }
+        #totalHoursContainer span {
+            font-size: 20px;
+        }
+        button {
+            padding: 12px 20px;
+            font-size: 18px;
+            background-color: #007aff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #4a4a4a;
+        }
+        #actionButtons {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weekly Table</h1>
+    <form id="weekForm" action="{% url 'timesheets_table' %}" method="get">
+    <select id="weekSelect" name="week_number" onchange="submitForm()">
+        <!-- Options will be populated by JavaScript -->
+    </select>
+</form>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Total Hours</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            {% for session in sessions %}
+                <tr>
+                    <td>{{ session.time_in|date:"n/j/Y" }}</td>
+                    <td>{{ session.time_in|date:"l" }}</td>
+                    <td>{{ session.time_in|time:"g:i A" }}</td>
+                    <td>{{ session.time_out|time:"g:i A" }}</td>
+                    <td>{{ session.total_hours_worked }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div id="totalHoursContainer">
+        <strong>Total Weekly Hours: </strong><span id="totalWeeklyHours">{{ total_hours }}</span>
+    </div>
+    <script>
+    const weekSelect = document.getElementById("weekSelect");
+
+    weekSelect.addEventListener("change", () => {
+      document.getElementById("weekForm").submit();
+    });
+
+    function populateWeekOptions() {
+      const today = new Date();
+      const currentWeek = Math.ceil(
+        (today - new Date(today.getFullYear(), 0, 1)) / 86400000 / 7
+      );
+      for (let i = 1; i <= currentWeek; i++) {
+        const option = document.createElement("option");
+        option.value = i;
+        const weekStartDate = getDateFromWeek(i, 0); // Get Monday of the week
+        option.textContent = "Week of " + weekStartDate.toLocaleDateString();
+        weekSelect.appendChild(option);
+      }
+
+      // Set the selected option based on the URL parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const selectedWeek = urlParams.get("week_number");
+      if (selectedWeek) {
+        weekSelect.value = selectedWeek;
+      }
+    }
+
+    function getDateFromWeek(weekNumber, dayOfWeek) {
+      const today = new Date();
+      const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
+      const daysOffset =
+        (weekNumber - 1) * 7 + dayOfWeek + (1 - firstDayOfYear.getDay());
+      return new Date(firstDayOfYear.valueOf() + daysOffset * 86400000);
+    }
+
+    populateWeekOptions();
+
+
+
+    const totalHoursElements = document.querySelectorAll('#tableBody td:nth-child(5)');
+    const totalWeeklyHoursElement = document.getElementById('totalWeeklyHours');
+
+    let totalWeeklyHours = 0;
+    let totalWeeklyMinutes = 0;
+
+    totalHoursElements.forEach((element) => {
+        const hours = element.textContent;
+        const formattedHours = convertTimeFormat(hours);
+        element.textContent = formattedHours;
+
+        totalWeeklyHours += parseInt(hours.split(':')[0]);
+        totalWeeklyMinutes += parseInt(hours.split(':')[1]);
+    });
+
+    // handle minutes overflow
+    totalWeeklyHours += Math.floor(totalWeeklyMinutes / 60);
+    totalWeeklyMinutes = totalWeeklyMinutes % 60;
+
+    const formattedTotalWeeklyHours = formatTime(totalWeeklyHours, totalWeeklyMinutes);
+    totalWeeklyHoursElement.textContent = formattedTotalWeeklyHours;
+
+    function convertTimeFormat(time) {
+        const [hours, minutes] = time.split(':');
+        return formatTime(hours, minutes);
+    }
+
+    function formatTime(hours, minutes) {
+        let formattedTime = '';
+
+        hours = parseInt(hours);
+        minutes = parseInt(minutes);
+
+        if (hours === 1) {
+            formattedTime += `${hours} hour`;
+        } else if (hours > 1) {
+            formattedTime += `${hours} hours`;
+        }
+
+        if (minutes === 1) {
+            formattedTime += `${formattedTime ? ', ' : ''}${minutes} minute`;
+        } else if (minutes > 1) {
+            formattedTime += `${formattedTime ? ', ' : ''}${minutes} minutes`;
+        }
+
+        return formattedTime;
+    }
+</script>
+</body>
+{% endblock %}

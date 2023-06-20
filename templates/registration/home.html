@@ -1,0 +1,93 @@
+{% extends "registration/base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    font-family: "SF Pro Text", "Myriad Set Pro", Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background-color: #ffffff;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.14), 0px 1px 5px rgba(0, 0, 0, 0.14);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    max-width: 800px;
+    height: 88px;
+    padding: 0 24px;
+  }
+  header h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+    letter-spacing: -0.3px;
+  }
+  header a {
+    color: #007aff;
+    font-size: 17px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  main {
+    max-width: 800px;
+    margin: 24px auto;
+    background-color: #ffffff;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.14), 0px 1px 5px rgba(0, 0, 0, 0.14);
+    border-radius: 8px;
+    text-align: center;
+    padding: 24px;
+  }
+  p {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 24px;
+    letter-spacing: -0.24px;
+  }
+  ul {
+    list-style-type: none;
+    text-align: center;
+    margin: 0 auto;
+    padding: 0;
+    max-width: 500px;
+  }
+  li {
+    margin-bottom: 16px;
+    font-size: 17px;
+    font-weight: 500;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 16px;
+  }
+  li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  li a {
+    color: #007aff;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+  }
+  li a:hover {
+    color: #0062cc;
+  }
+</style>
+
+<header>
+  <h1>Welcome, {{ first_name }}!</h1>
+  <a href="{% url 'logout' %}">Sign Out</a>
+</header>
+<main>
+  <p><strong>Where would you like to go?</strong></p>
+  <ul>
+    <li><a href="{% url 'sessions_index' %}">Sessions</a></li>
+    <li><a href="{% url 'timesheets_index' %}">Time sheets</a></li>
+    <li><a href="{% url 'invoices_index' %}">Invoices</a></li>
+    <li><a href="{% url 'progress_reports_index' %}">Progress reports</a></li>
+    <li><a href="{% url 'accounts_index' %}">My account</a></li>
+  </ul>
+</main>
+{% endblock %}

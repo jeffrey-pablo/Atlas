@@ -1,0 +1,355 @@
+{% extends "registration/base.html" %}
+
+{% block title %}Invoice{% endblock %}
+
+{% block content %}
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+      body {
+        font-family: "SF Pro Text", "Myriad Set Pro", Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+      }
+      header {
+        background-color: #ffffff;
+        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.14), 0px 1px 5px rgba(0, 0, 0, 0.14);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 auto;
+        max-width: 800px;
+        height: 88px;
+        padding: 0 24px;
+      }
+      header h1 {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0;
+        letter-spacing: -0.3px;
+      }
+      header a {
+        color: #007aff;
+        font-size: 17px;
+        font-weight: 500;
+        text-decoration: none;
+      }
+      main {
+        max-width: 800px;
+        margin: 24px auto;
+        background-color: #ffffff;
+        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 2px 2px rgba(0, 0, 0, 0.14), 0px 1px 5px rgba(0, 0, 0, 0.14);
+        border-radius: 8px;
+        text-align: center;
+        padding: 24px;
+      }
+      p {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0 0 24px;
+        letter-spacing: -0.24px;
+      }
+      ul {
+        list-style-type: none;
+        text-align: center;
+        margin: 0 auto;
+        padding: 0;
+        max-width: 500px;
+      }
+      li {
+        margin-bottom: 16px;
+        font-size: 17px;
+        font-weight: 500;
+        border-bottom: 1px solid #e5e5e5;
+        padding-bottom: 16px;
+      }
+      li:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      li a {
+        color: #007aff;
+        text-decoration: none;
+        transition: color 0.2s ease-in-out;
+      }
+      li a:hover {
+        color: #0062cc;
+      }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    select, input[type="date"] {
+      padding: 5px;
+      margin-right: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f5f5f7;
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .rate-dropdown {
+      width: 150px;
+    }
+
+    .amount-cell, .total-amount {
+      text-align: left;
+    }
+
+    tfoot td {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Invoice</h1>
+    <div>
+      <label for="filter-by">Filter by:</label>
+      <select id="filter-by">
+        <option value="all">All</option>
+        <option value="day">Day</option>
+        <option value="week">Week</option>
+        <option value="month">Month</option>
+      </select>
+      <label for="filter-date">Filter date:</label>
+      <input type="date" id="filter-date" onchange="filterTable()">
+    </div>
+    <table id="invoice-table">
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Description</th>
+          <th>Date Completed</th>
+          <th>Total Hours</th>
+          <th>Rate</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for invoice in invoices %}
+        <tr>
+          <td>{{ invoice.task }}</td>
+          <td>{{ invoice.description }}</td>
+          <td>{{ invoice.date_completed|date:'m/d/Y' }}</td>
+          <td>{{ invoice.total_hours }}</td>
+          <td>
+            <select class="rate-dropdown" onchange="calculateAmount(this)">
+              <option value="65">Regular ($65/hr)</option>
+              <option value="97.5">Overtime ($97.50/hr)</option>
+            </select>
+          </td>
+          <td class="amount-cell">${{ invoice.total_hours|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr id="total-hours-row">
+          <td colspan="5">Total Hours</td>
+          <td id="total-hours"></td>
+        </tr>
+        <tr id="total-amount-row">
+          <td colspan="5">Total Amount</td>
+          <td class="total-amount" id="total-amount"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <script>
+    const filterBySelect = document.getElementById("filter-by");
+    const filterDateInput = document.getElementById("filter-date");
+    const tableRows = document.querySelectorAll("tbody tr");
+    const rateSelects = document.querySelectorAll(".rate-dropdown");
+
+
+
+    function filterTable() {
+      const filter = filterBySelect.value;
+      const selectedDate = new Date(filterDateInput.value);
+      let hasData = false;
+
+      tableRows.forEach(row => {
+        const dateCell = row.cells[2];
+        const rowDate = new Date(dateCell.textContent);
+
+        row.style.display = "none";
+
+        if (
+          filter === "all" ||
+          (filter === "day" && isSameDay(selectedDate, rowDate)) ||
+          (filter === "week" && isSameWeek(selectedDate, rowDate)) ||
+          (filter === "month" && isSameMonth(selectedDate, rowDate))
+        ) {
+          row.style.display = "";
+          hasData = true;
+        }
+      });
+
+      if (!hasData) {
+        const totalHoursCell = document.getElementById("total-hours");
+        const totalAmountCell = document.getElementById("total-amount");
+        totalHoursCell.textContent = "0.00";
+        totalAmountCell.textContent = "$0.00";
+      }
+
+      updateTotalHours();
+      updateTotalAmount();
+    }
+
+
+    function isSameDay(date1, date2) {
+      return (
+        date1.getFullYear() === date2.getFullYear() &&
+        date1.getMonth() === date2.getMonth() &&
+        date1.getDate() === date2.getDate()
+      );
+    }
+
+    function isSameWeek(date1, date2) {
+      const oneDay = 24 * 60 * 60 * 1000;
+      const firstDayOfWeek = getFirstDayOfWeek(date1);
+      const lastDayOfWeek = new Date(firstDayOfWeek.getTime() + 6 * oneDay);
+
+      return (
+        date2 >= firstDayOfWeek &&
+        date2 <= lastDayOfWeek
+      );
+    }
+
+    function getFirstDayOfWeek(date) {
+      const dayOfWeek = date.getDay();
+      const firstDayOfWeek = new Date(date);
+      firstDayOfWeek.setDate(date.getDate() - dayOfWeek + 1);
+      firstDayOfWeek.setHours(0, 0, 0, 0);
+      return firstDayOfWeek;
+    }
+
+    function isSameMonth(date1, date2) {
+      return (
+        date1.getFullYear() === date2.getFullYear() &&
+        date1.getMonth() === date2.getMonth()
+      );
+    }
+
+
+
+    function calculateAmount(select) {
+      const rate = parseFloat(select.value);
+      const row = select.closest("tr");
+      const totalHours = parseFloat(row.cells[3].textContent);
+      const amountCell = row.cells[5];
+      let totalAmount = 0;
+
+      if (rate === 65) {
+        totalAmount = totalHours * 65;
+      } else if (rate === 97.5) {
+        totalAmount = totalHours * 97.5;
+      }
+
+      amountCell.textContent = "$" + totalAmount.toFixed(2);
+      updateTotalAmount();
+    }
+
+
+
+    function updateTotalHours() {
+      const visibleRows = document.querySelectorAll("tbody tr:not([style*='display: none'])");
+      let totalHours = 0;
+      let hasData = false;
+
+      visibleRows.forEach(row => {
+        const hours = parseFloat(row.cells[3].textContent);
+        if (!isNaN(hours)) {
+          totalHours += hours;
+          hasData = true;
+        }
+      });
+
+      const totalHoursCell = document.getElementById("total-hours");
+      totalHoursCell.textContent = hasData ? totalHours.toFixed(2) : "0.00";
+    }
+
+
+    function updateTotalAmount() {
+      const visibleRows = document.querySelectorAll("tbody tr:not([style*='display: none'])");
+      let totalAmount = 0;
+      let hasData = false;
+
+      visibleRows.forEach(row => {
+        const amount = parseFloat(row.cells[5].textContent.replace("$", ""));
+        if (!isNaN(amount)) {
+          totalAmount += amount;
+          hasData = true;
+        }
+      });
+
+      const totalAmountCell = document.getElementById("total-amount");
+      totalAmountCell.textContent = hasData ? "$" + totalAmount.toFixed(2) : "$0.00";
+    }
+
+
+
+
+    // Set initial values for Amount column on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      const rateDropdowns = document.querySelectorAll(".rate-dropdown");
+
+      for (let i = 0; i < rateDropdowns.length; i++) {
+        calculateAmount(rateDropdowns[i]);
+      }
+    });
+
+    // Event listeners
+    filterBySelect.addEventListener("change", filterTable);
+    filterDateInput.addEventListener("change", filterTable);
+
+    rateSelects.forEach(select => {
+      select.addEventListener("change", function() {
+        calculateAmount(this);
+      });
+    });
+
+    // Initial filtering
+    filterTable();
+
+  </script>
+</body>
+{% endblock %}

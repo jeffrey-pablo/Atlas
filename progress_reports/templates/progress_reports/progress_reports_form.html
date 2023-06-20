@@ -1,0 +1,310 @@
+{% extends "registration/base.html" %}
+
+{% block title %}Project Status Report{% endblock %}
+
+{% block content %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Status Report</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      integrity="sha512-AotJ1wz+Rtof8F6oCmv6J92UjQfh1q3Xr+Y5gnIatRS/4Qd1q3O4lGj+5BXHl5OM5RgWpSj0IzO/eKjwltJtsg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+        body {
+            font-family: "SF Pro Text", "Myriad Set Pro", Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #f9f9f9;
+        color: #333;
+        line-height: 1.5;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .header h1 {
+        font-size: 36px;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .header a {
+        font-size: 18px;
+        text-decoration: none;
+        color: #666;
+        transition: all 0.3s ease-in-out;
+      }
+
+      .header a:hover {
+        color: #333;
+      }
+
+      .status {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .status h2 {
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .status i {
+        font-size: 36px;
+        color: #666;
+      }
+
+      .status p {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+
+      table th,
+      table td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+      }
+
+      table th {
+        background-color: #eee;
+      }
+
+      table tr:hover {
+        background-color: #f5f5f5;
+      }
+
+      .footer {
+        text-align: center;
+        font-size: 14px;
+        margin-top: 20px;
+      }
+
+      .footer p {
+        margin: 0;
+      }
+
+      .status-box {
+        background-color: #fff;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .status-box h3 {
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .status-box .section-subheading {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .status-box input[type="text"] {
+        width: 96%;
+      }
+
+      .status-box select {
+        appearance: none;
+        border: none;
+        background-color: transparent;
+        color: #333;
+      }
+    </style>
+  <body>
+    <div class="container">
+      <!-- Add a form element to wrap the input fields -->
+      <form method="post" action="{% url 'progress_reports_form' %}">
+        {% csrf_token %} <!-- Add CSRF token for security -->
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="section-heading">Project Status Report</h2>
+            <p class="section-subheading">
+              This report provides an update on the current status of the project as of
+              <span id="date"></span>.
+            </p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="status-box">
+              <h3>Project Overview</h3>
+              <p class="section-subheading">Completed Work</p>
+              <ol start="1">
+                <li><input type="text" name="completed_work_1"></li>
+                <li><input type="text" name="completed_work_2"></li>
+                <li><input type="text" name="completed_work_3"></li>
+                <li><input type="text" name="completed_work_4"></li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="status-box">
+              <h3>Project Timeline</h3>
+              <ul>
+                <li>
+                  Phase 1: Planning and Design - <select class="status-box-select" name="phase_1_status">
+                    <option value="not-started">Not Started</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                </li>
+                <li>
+                  Phase 2: Development - <select class="status-box-select" name="phase_2_status">
+                    <option value="not-started">Not Started</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                </li>
+                <li>
+                  Phase 3: Testing and Deployment - <select class="status-box-select" name="phase_3_status">
+                    <option value="not-started">Not Started</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="status-box">
+              <h3>Planned Work</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th style="text-align: center;">Action Items</th>
+                    <th style="text-align: center; width: 14%;">Status</th>
+                    <th style="text-align: center; width: 14%;">Due Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><input type="text" name="planned_work_1"></td>
+                    <td style="text-align: center;">
+                      <select name="planned_work_1_status">
+                        <option value="" disabled selected>- Select -</option>
+                        <option value="on-track">On Track</option>
+                        <option value="not-started">Not Started</option>
+                      </select>
+                    </td>
+                    <td style="text-align: center;"><input type="date" name="due_date_1"></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" name="planned_work_2"></td>
+                    <td style="text-align: center;">
+                      <select name="planned_work_2_status">
+                        <option value="" disabled selected>- Select -</option>
+                        <option value="on-track">On Track</option>
+                        <option value="not-started">Not Started</option>
+                      </select>
+                    </td>
+                    <td style="text-align: center;"><input type="date" name="due_date_2"></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" name="planned_work_3"></td>
+                    <td style="text-align: center;">
+                      <select name="planned_work_3_status">
+                        <option value="" disabled selected>- Select -</option>
+                        <option value="on-track">On Track</option>
+                        <option value="not-started">Not Started</option>
+                      </select>
+                    </td>
+                    <td style="text-align: center;"><input type="date" name="due_date_3"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="status-box">
+              <h3>Project Issues</h3>
+              <ul>
+                <li>
+                  Issue 1: <input type="text" name="project_issue_1" style="width: 70%;"
+                    > - <select name="project_issue_1_status">
+                    <option value="" disabled selected>- Select -</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="not-started">Not Started</option>
+                  </select>
+                </li>
+                <li>
+                  Issue 2: <input type="text" name="project_issue_2" style="width: 70%;"
+                    > - <select name="project_issue_2_status">
+                    <option value="" disabled selected>- Select -</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="not-started">Not Started</option>
+                  </select>
+                </li>
+                <li>
+                  Issue 3: <input type="text" name="project_issue_3" style="width: 70%;"
+                    > - <select name="project_issue_3_status">
+                    <option value="" disabled selected>- Select -</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="not-started">Not Started</option>
+                  </select>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+              <!-- Submit button -->
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit">Submit</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      var today = new Date();
+      var month = today.getMonth() + 1; // Get month (0-11), add 1 to make it (1-12)
+      var day = today.getDate(); // Get day of the month (1-31)
+      var year = today.getFullYear(); // Get four digit year
+      var formattedDate = month + "/" + day + "/" + year;
+      document.getElementById("date").innerHTML = formattedDate;
+    </script>
+  </body>
+{% endblock %}

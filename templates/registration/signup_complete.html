@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up complete</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', 'Helvetica', sans-serif;
+            color: #444444;
+            background-color: #f6f6f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        h1 {
+            font-size: 1.75rem;
+            font-weight: bold;
+            margin: 0;
+            margin-bottom: 1rem;
+        }
+        p {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+        .login-button {
+            background-color: #007aff;
+            color: #ffffff;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        .login-button:hover {
+            background-color: #0062cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sign up complete</h1>
+        <p>Thank you for signing up.</p><p>You can now log in using your email and password.</p>
+        <a href="{% url 'login' %}" class="login-button">Log In</a>
+    </div>
+</body>
+</html>
