@@ -15,7 +15,6 @@ class ProgressReportsViewTest(TestCase):
         self.confirmation_url = reverse('progress_reports_confirmation')
         self.index_url = reverse('progress_reports_index')
         self.user = get_user_model().objects.create_user(
-            username='testuser',
             email='test@example.com',
             password='testpassword'
         )

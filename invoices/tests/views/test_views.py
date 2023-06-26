@@ -15,23 +15,22 @@ class InvoicesViewTest(TestCase):
         self.invoices_index_url = reverse('invoices_index')
         self.factory = APIRequestFactory()
         self.user = get_user_model().objects.create_user(
-            username='testuser',
             email='test@example.com',
             password='testpassword'
         )
         self.invoice_data = {
-            'client': 'Client A',
+            'task': 'Task A',
             'description': 'Invoice description',
-            'total_hours': 10
+            'total_hours': 10.5
         }
         self.invoice = Invoice.objects.create(
-            client='Client A',
+            task='Task A',
             description='Invoice description',
-            total_hours=10
+            total_hours=10.5
         )
 
     def test_invoice_viewset_list(self):
-        view = InvoiceViewSet.as_view(actions={'get': 'list'})
+        view = InvoiceViewSet.as_view({'get': 'list'})
         request = self.factory.get('/api/invoices/')
         force_authenticate(request, user=self.user)
         response = view(request)
@@ -41,7 +40,7 @@ class InvoicesViewTest(TestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_invoice_viewset_retrieve(self):
-        view = InvoiceViewSet.as_view(actions={'get': 'retrieve'})
+        view = InvoiceViewSet.as_view({'get': 'retrieve'})
         request = self.factory.get('/api/invoices/1/')
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.invoice.id)
@@ -55,8 +54,8 @@ class InvoicesViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'invoices/invoices_table.html')
         self.assertEqual(response.context['invoices'].count(), 1)
-        self.assertEqual(response.context['total_hours'], 10)
-        self.assertEqual(response.context['total_amount'], 650)
+        self.assertEqual(response.context['total_hours'], 10.5)
+        self.assertEqual(response.context['total_amount'], 682.5)
 
     def test_invoices_index_view(self):
         self.client.force_login(self.user)

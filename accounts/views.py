@@ -22,7 +22,7 @@ def home(request):
 class SignUpView(CreateView):
     template_name = 'registration/signup.html'
     form_class = CustomUserCreationForm
-    success_url = reverse_lazy('login')
+    success_url = reverse_lazy('signup_complete')
     model = CustomUser
 
 class SignUpCompleteView(TemplateView):

@@ -8,9 +8,10 @@ class AccountsViewTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.signup_url = reverse('signup')
+        self.signup_complete_url = reverse('signup_complete')
         self.login_url = reverse('login')
         self.accounts_index_url = reverse('accounts_index')
-        self.edit_profile_form_url = reverse('edit_profile_form')
+        self.edit_profile_form_url = reverse('edit_profile')
         self.edit_profile_done_url = reverse('edit_profile_done')
         self.user_data = {
             'email': 'test@example.com',
@@ -20,7 +21,6 @@ class AccountsViewTest(TestCase):
             'password2': 'testpassword',
         }
         self.user = get_user_model().objects.create_user(
-            username='testuser',
             email='test@example.com',
             password='testpassword',
             first_name='John',
@@ -36,16 +36,28 @@ class AccountsViewTest(TestCase):
     def test_home_view_unauthenticated(self):
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/accounts/login/?next=/')
+        self.assertRedirects(response, '/accounts/login/?next=/accounts/home/')
 
     def test_signup_view(self):
         response = self.client.get(self.signup_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'registration/signup.html')
 
-        response = self.client.post(self.signup_url, self.user_data)
+        # create another user with different email
+        user_data2 = {
+            'email': 'test2@example.com',
+            'first_name': 'John2',
+            'last_name': 'Doe2',
+            'password1': 'testpassword',
+            'password2': 'testpassword',
+        }
+
+        response = self.client.post(self.signup_url, user_data2)
+        if response.status_code != 302:
+            print(response.content)  # print the response content
+            print(response.context['form'].errors)  # print form errors
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, self.login_url)
+        self.assertRedirects(response, self.signup_complete_url)
 
         self.assertEqual(get_user_model().objects.count(), 2)
 
@@ -58,7 +70,7 @@ class AccountsViewTest(TestCase):
     def test_accounts_index_view_unauthenticated(self):
         response = self.client.get(self.accounts_index_url)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/accounts/login/?next=/accounts/')
+        self.assertRedirects(response, '/accounts/login/?next=/accounts/index/')
 
     def test_edit_profile_form_view(self):
         self.client.force_login(self.user)
@@ -91,4 +103,4 @@ class AccountsViewTest(TestCase):
     def test_edit_profile_done_view_unauthenticated(self):
         response = self.client.get(self.edit_profile_done_url)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/accounts/login/?next=/accounts/edit-profile/done/')
+        self.assertRedirects(response, '/accounts/login/?next=/accounts/edit_profile/done/')

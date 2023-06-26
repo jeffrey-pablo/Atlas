@@ -1,4 +1,3 @@
-import datetime
 from collections import OrderedDict
 
 from django.contrib.auth.decorators import login_required
@@ -152,14 +151,6 @@ class SessionViewSet(viewsets.ModelViewSet):
             timesheet = TimeSheet.objects.create(name=f"Week of {week_of_value}", week_of=week_of_value)
 
         serializer.save(time_sheet=timesheet, user=user, time_in=time_in)
-
-def calculate_day_of_week(time_in_str):
-    time_in_format = "%Y-%m-%dT%H:%M:%SZ"
-    time_in = datetime.datetime.strptime(time_in_str, time_in_format)
-    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    day_of_week = days[time_in.weekday()]
-    date_str = time_in.strftime("%Y-%m-%d")
-    return day_of_week, date_str
 
 
 @login_required(login_url='/accounts/login/')
